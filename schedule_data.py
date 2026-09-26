@@ -62,7 +62,7 @@ SLOTS = [
          label="Lunch Break", beer="A5"),
     dict(id="SAT3", day="Saturday", start="1:00 PM", end="2:45 PM", kind="game",
          d1=("A1","A3"), d2=("B1","B3"), score1="B2", score2="A2", beer="B2",
-         result1=None, result2=None),
+         result1=[29, 11], result2=[12, 14]),
     dict(id="SAT4", day="Saturday", start="2:45 PM", end="4:30 PM", kind="game",
          d1=("A4","A5"), d2=("B4","B5"), score1="B6", score2="A6", beer="A6",
          result1=None, result2=None),
