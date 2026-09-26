@@ -150,6 +150,20 @@ main{padding:14px 20px 0;}
 .rules-section h3:first-child{margin-top:0;}
 .rules-section p{font-size:12.5px;line-height:1.5;color:var(--ink);margin:0 0 8px;}
 
+.standings-table{width:100%;border-collapse:collapse;font-size:14px;}
+.standings-table th{font-size:10.5px;font-weight:800;color:var(--muted);letter-spacing:.05em;
+  text-align:center;padding:4px 4px 6px;border-bottom:1.5px solid var(--line);}
+.standings-table th.team-col{text-align:left;}
+.standings-table td{padding:8px 4px;text-align:center;border-bottom:1px dotted var(--line);
+  font-variant-numeric:tabular-nums;}
+.standings-table tr:last-child td{border-bottom:none;}
+.standings-table td.team-col{text-align:left;font-family:var(--f-display);font-weight:700;}
+.standings-table td.rank{width:18px;color:var(--muted);font-weight:700;font-size:12px;}
+.standings-table td.pts{font-weight:800;color:var(--lapis);}
+.standings-table tr.final-spot td.team-col{color:var(--lapis);}
+.standings-table tr.final-spot td.rank{color:var(--cream);}
+.standings-table tr.final-spot td.rank span{background:var(--lapis);border-radius:50%;
+  display:inline-flex;width:18px;height:18px;align-items:center;justify-content:center;}
 .hidden{display:none !important;}
 </style>
 </head>
@@ -199,6 +213,9 @@ function buildTeamSelect(){
   const optAll = document.createElement("option");
   optAll.value = "__all__"; optAll.textContent = "Full master schedule";
   sel.appendChild(optAll);
+  const optStand = document.createElement("option");
+  optStand.value = "__standings__"; optStand.textContent = "Standings";
+  sel.appendChild(optStand);
   const optMenu = document.createElement("option");
   optMenu.value = "__menu__"; optMenu.textContent = "Food Truck & Concession";
   sel.appendChild(optMenu);
@@ -395,12 +412,88 @@ function renderRules(){
   return html;
 }
 
+function poolGames(){
+  const games = [];
+  DATA.slots.forEach(s => {
+    if(s.kind !== "game") return;
+    [[s.d1, s.result1], [s.d2, s.result2]].forEach(([pair, res]) => {
+      if(Array.isArray(pair) && res) games.push({a: pair[0], b: pair[1], ra: res[0], rb: res[1]});
+    });
+  });
+  return games;
+}
+
+function computeStandings(pool){
+  const games = poolGames();
+  const rows = {};
+  DATA.teams.filter(t => poolOf(t) === pool).forEach(t => {
+    rows[t] = {team: t, gp: 0, w: 0, l: 0, t: 0, pts: 0, rf: 0, ra: 0, diff: 0};
+  });
+  games.forEach(g => {
+    [[g.a, g.ra, g.rb], [g.b, g.rb, g.ra]].forEach(([team, f, a]) => {
+      const r = rows[team]; if(!r) return;
+      r.gp++; r.rf += f; r.ra += a;
+      r.diff += Math.max(-7, Math.min(7, f - a));  // rule: +/- capped at 7 per game
+      if(f > a){ r.w++; r.pts += 2; } else if(f < a){ r.l++; } else { r.t++; r.pts += 1; }
+    });
+  });
+  const list = Object.values(rows);
+  // Head-to-head points among a group of tied teams; only used if they all played each other.
+  function h2h(group){
+    const set = new Set(group.map(r => r.team)), pts = {}, met = {};
+    group.forEach(r => { pts[r.team] = 0; });
+    games.forEach(g => {
+      if(!set.has(g.a) || !set.has(g.b)) return;
+      met[[g.a, g.b].sort().join()] = true;
+      if(g.ra > g.rb) pts[g.a] += 2; else if(g.rb > g.ra) pts[g.b] += 2; else { pts[g.a]++; pts[g.b]++; }
+    });
+    const needed = group.length * (group.length - 1) / 2;
+    return Object.keys(met).length === needed ? pts : null;
+  }
+  const byPts = {};
+  list.forEach(r => (byPts[r.pts] = byPts[r.pts] || []).push(r));
+  const h2hPts = {};
+  Object.values(byPts).forEach(group => {
+    const h = group.length > 1 ? h2h(group) : null;
+    group.forEach(r => { h2hPts[r.team] = h ? h[r.team] : 0; });
+  });
+  list.sort((x, y) => (y.pts - x.pts) || (h2hPts[y.team] - h2hPts[x.team]) ||
+    (y.diff - x.diff) || x.team.localeCompare(y.team));
+  return list;
+}
+
+function renderStandings(){
+  let html = "";
+  ["A", "B"].forEach(pool => {
+    const rows = computeStandings(pool);
+    html += `<div class="ref-card"><h2>Pool ${pool}</h2>
+      <div class="ref-sub">Top 2 advance to the Pool ${pool} final</div>
+      <table class="standings-table">
+        <thead><tr><th></th><th class="team-col">TEAM</th><th>GP</th><th>W</th><th>L</th><th>T</th><th>+/&minus;</th><th>PTS</th></tr></thead>
+        <tbody>`;
+    rows.forEach((r, i) => {
+      const d = r.diff > 0 ? "+" + r.diff : r.diff < 0 ? "&minus;" + (-r.diff) : "0";
+      html += `<tr class="${i < 2 && r.gp > 0 ? "final-spot" : ""}">
+        <td class="rank"><span>${i + 1}</span></td><td class="team-col">${td(r.team)}</td>
+        <td>${r.gp}</td><td>${r.w}</td><td>${r.l}</td><td>${r.t}</td><td>${d}</td><td class="pts">${r.pts}</td>
+      </tr>`;
+    });
+    html += `</tbody></table></div>`;
+  });
+  html += `<div class="ref-note" style="margin:-4px 2px 14px;">Win = 2 pts, tie = 1. Ties in points are broken by head-to-head
+    (if all tied teams played each other), then run differential capped at &plusmn;7 per game.
+    Unofficial &mdash; the tournament organizers make the final call.</div>`;
+  return html;
+}
+
 function render(){
   buildDayTabs();
   document.getElementById("dayTabsWrap").style.display = currentView === "__all__" ? "" : "none";
   const content = document.getElementById("content");
   if(currentView === "__all__"){
     content.innerHTML = renderMasterDay(currentDay);
+  } else if(currentView === "__standings__"){
+    content.innerHTML = renderStandings();
   } else if(currentView === "__menu__"){
     content.innerHTML = renderMenu();
   } else if(currentView === "__rules__"){
