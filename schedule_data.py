@@ -54,7 +54,7 @@ SLOTS = [
     # SATURDAY
     dict(id="SAT1", day="Saturday", start="8:00 AM", end="9:45 AM", kind="game",
          d1=("A3","A6"), d2=("B3","B6"), score1="B1", score2="A1", beer=None,
-         result1=None, result2=None),
+         result1=None, result2=[15, 10]),
     dict(id="SAT2", day="Saturday", start="9:45 AM", end="11:30 AM", kind="game",
          d1=("A2","A4"), d2=("B2","B4"), score1="B3", score2="A3", beer="A3",
          result1=None, result2=None),
