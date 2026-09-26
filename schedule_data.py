@@ -44,10 +44,10 @@ SLOTS = [
     # FRIDAY
     dict(id="FRI1", day="Friday", start="6:15 PM", end="8:00 PM", kind="game",
          d1=("A1","A6"), d2=("B1","B6"), score1="B5", score2="A5", beer=None,
-         result1=None, result2=None),
+         result1=[22, 6], result2=[22, 13]),
     dict(id="FRI2", day="Friday", start="8:00 PM", end="9:45 PM", kind="game",
          d1=("A2","A5"), d2=("B2","B5"), score1="B6", score2="A6", beer=None,
-         result1=None, result2=None),
+         result1=[16, 6], result2=[16, 16]),
     dict(id="FRI-BUF", day="Friday", start="9:45 PM", end="10:00 PM", kind="buffer",
          label="Unused \u2014 15 min buffer"),
 
