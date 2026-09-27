@@ -74,7 +74,7 @@ SLOTS = [
          result1=[15, 6], result2=[16, 15]),
     dict(id="SAT7", day="Saturday", start="8:00 PM", end="9:45 PM", kind="game",
          d1=("A1","A4"), d2=("B1","B4"), score1="B3", score2="A3", beer="B3",
-         result1=[23, 8], result2=None),
+         result1=[23, 8], result2=[17, 11]),
     dict(id="SAT-BUF", day="Saturday", start="9:45 PM", end="10:00 PM", kind="buffer",
          label="Unused \u2014 15 min buffer"),
 

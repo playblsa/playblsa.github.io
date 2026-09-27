@@ -201,7 +201,7 @@ const DAY_ORDER = ["Friday","Saturday","Sunday"];
 let teamNames = {};
 DATA.teams.forEach(t => teamNames[t] = (DATA.teamNames && DATA.teamNames[t]) || t);
 let currentView = "__all__";
-let currentDay = "Saturday";
+let currentDay = "Sunday";
 
 function td(code){ return teamNames[code] || code; }
 
