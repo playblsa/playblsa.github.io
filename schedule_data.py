@@ -84,7 +84,7 @@ SLOTS = [
          result1=[19, 12], result2=[21, 14]),
     dict(id="SUN2", day="Sunday", start="11:15 AM", end="1:00 PM", kind="game",
          d1=("A1","A5"), d2=("B1","B5"), score1="B2", score2="A2", beer="A2",
-         result1=[15, 12], result2=None),
+         result1=[15, 12], result2=[24, 8]),
     dict(id="SUN3", day="Sunday", start="1:00 PM", end="2:45 PM", kind="game",
          d1=("A4","A3"), d2=("B4","B3"), score1="B1", score2="A1", beer="B1",
          result1=None, result2=None),
@@ -92,10 +92,10 @@ SLOTS = [
          label="Buffer \u2014 rest before playoffs begin"),
     dict(id="SUN-POOLB", day="Sunday", start="3:15 PM", end="5:15 PM", kind="playoff",
          label="POOL B FINAL", score1="EXECS", score2="EXECS", beer="A1",
-         teams=None, result=None),
+         teams=("B3","B1"), result=None),
     dict(id="SUN-POOLA", day="Sunday", start="5:15 PM", end="7:30 PM", kind="playoff",
          label="POOL A FINAL", score1="EXECS", score2="EXECS", beer="B6",
-         teams=None, result=None),
+         teams=("A1","A2"), result=None),
 ]
 
 DAY_INFO = {
@@ -123,6 +123,10 @@ def team_games(team_code):
                     opponent = pair[0] if pair[1] == team_code else pair[1]
                     result = s.get(rkey)
                     out.append(dict(slot=s, role="play", opponent=opponent, diamond=dname, result=result, pair=pair))
+            pair = s.get("teams")
+            if pair and team_code in pair:
+                opponent = pair[0] if pair[1] == team_code else pair[1]
+                out.append(dict(slot=s, role="play", opponent=opponent, diamond=None, result=s.get("result"), pair=pair))
         if s.get("score1") == team_code:
             out.append(dict(slot=s, role="score", opponent=None, diamond="Diamond 1"))
         if s.get("score2") == team_code:

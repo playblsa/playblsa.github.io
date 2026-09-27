@@ -7,7 +7,7 @@ from menu_rules_data import (FOOD_TRUCK_VENDOR, FOOD_TRUCK_TAGLINE, FOOD_TRUCK_I
 
 def conv(s):
     out = dict(s)
-    for k in ('d1','d2'):
+    for k in ('d1','d2','teams'):
         if isinstance(out.get(k), tuple):
             out[k] = list(out[k])
     return out
@@ -124,6 +124,9 @@ main{padding:14px 20px 0;}
 .special-row.playoff{background:var(--hero);color:var(--cream);}
 .special-row.playoff .ptime{font-family:var(--f-mono);color:var(--cream);font-size:13px;text-align:left;}
 .special-row.playoff .plabel{font-family:var(--f-display);font-weight:800;font-size:22px;margin:6px 0 4px;}
+.special-row.playoff .matchup{color:var(--cream);font-size:20px;margin:2px 0 6px;}
+.special-row.playoff .matchup .winner{color:var(--cream);text-decoration:underline;text-underline-offset:4px;}
+.special-row.playoff .matchup .score-dash{color:var(--dark-muted);}
 .special-row.playoff .psub{font-size:11.5px;color:var(--dark-muted);}
 
 .team-entry{border:1.5px solid var(--line);border-radius:10px;background:#fff;margin-bottom:9px;
@@ -292,6 +295,7 @@ function renderMasterDay(day){
       html += `<div class="special-row playoff">
         <div class="ptime">${s.start} &ndash; ${s.end}</div>
         <div class="plabel">${s.label}</div>
+        ${Array.isArray(s.teams) ? matchupHtml(s.teams, s.result) : ""}
         <div class="psub">Scorekeeping: Tournament Execs</div>
         ${beerHtml ? `<div style="margin-top:8px;display:flex;justify-content:center;">${beerHtml}</div>` : ""}
       </div>`;
@@ -319,6 +323,10 @@ function teamGames(code){
         out.push({slot:s, role:"play", diamond:"Diamond 2", opponent: s.d2[myIdx===0?1:0], result: s.result2, myIdx});
       }
     }
+    if(s.kind === "playoff" && Array.isArray(s.teams) && s.teams.includes(code)){
+      const myIdx = s.teams[0]===code ? 0 : 1;
+      out.push({slot:s, role:"play", diamond:null, opponent: s.teams[1-myIdx], result: s.result, myIdx});
+    }
     if(s.score1 === code){ out.push({slot:s, role:"score", diamond:"Diamond 1"}); }
     if(s.score2 === code){ out.push({slot:s, role:"score", diamond:"Diamond 2"}); }
     if(s.beer === code){ out.push({slot:s, role:"beer", diamond:null}); }
@@ -336,7 +344,7 @@ function renderTeamView(code){
   const games = teamGames(code);
   let html = `<div style="margin-bottom:10px;">
     <span style="font-family:var(--f-display);font-weight:800;font-size:20px;">${td(code)}</span>
-    <span style="font-size:12px;color:var(--muted);"> &middot; Pool ${poolOf(code)} &middot; ${games.filter(g=>g.role==='play').length} pool-play games</span>
+    <span style="font-size:12px;color:var(--muted);"> &middot; Pool ${poolOf(code)} &middot; ${games.filter(g=>g.role==='play' && g.slot.kind==='game').length} pool-play games</span>
   </div>`;
   DAY_ORDER.forEach(day => {
     const dayGames = games.filter(g => g.slot.day === day);
