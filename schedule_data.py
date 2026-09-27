@@ -84,7 +84,7 @@ SLOTS = [
          result1=[19, 12], result2=[21, 14]),
     dict(id="SUN2", day="Sunday", start="11:15 AM", end="1:00 PM", kind="game",
          d1=("A1","A5"), d2=("B1","B5"), score1="B2", score2="A2", beer="A2",
-         result1=None, result2=None),
+         result1=[15, 12], result2=None),
     dict(id="SUN3", day="Sunday", start="1:00 PM", end="2:45 PM", kind="game",
          d1=("A4","A3"), d2=("B4","B3"), score1="B1", score2="A1", beer="B1",
          result1=None, result2=None),
