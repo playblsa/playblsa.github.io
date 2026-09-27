@@ -87,7 +87,7 @@ SLOTS = [
          result1=[15, 12], result2=[24, 8]),
     dict(id="SUN3", day="Sunday", start="1:00 PM", end="2:45 PM", kind="game",
          d1=("A4","A3"), d2=("B4","B3"), score1="B1", score2="A1", beer="B1",
-         result1=None, result2=None),
+         result1=None, result2=[5, 18]),
     dict(id="SUN-BUF", day="Sunday", start="2:45 PM", end="3:15 PM", kind="buffer",
          label="Buffer \u2014 rest before playoffs begin"),
     dict(id="SUN-POOLB", day="Sunday", start="3:15 PM", end="5:15 PM", kind="playoff",
