@@ -95,7 +95,7 @@ SLOTS = [
          teams=("B3","B1"), result=[25, 22]),
     dict(id="SUN-POOLA", day="Sunday", start="5:15 PM", end="7:30 PM", kind="playoff",
          label="POOL A FINAL", score1="EXECS", score2="EXECS", beer="B6",
-         teams=("A1","A2"), result=None),
+         teams=("A1","A2"), result=[21, 15]),
 ]
 
 DAY_INFO = {
